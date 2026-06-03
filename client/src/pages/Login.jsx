@@ -81,18 +81,18 @@ export default function Login() {
               }
             />
 
-            <p
-              style={{
-                marginBottom: "15px",
-                cursor: "pointer",
-                textAlign: "right",
-                color: "white",
-              }}
-              onClick={() => navigate("/forgot-password")}
-            >
-              Forgot Password?
-            </p>
-
+           <p
+    style={{
+       marginBottom: "15px",
+       cursor: "pointer",
+       textAlign: "right",
+       color: "white",
+       fontSize: "14px",
+      }}
+        onClick={() => navigate("/forgot-password")}
+    >
+        Forgot Password?
+    </p> 
             <button className="login-btn" disabled={loading}>
               {loading ? "Checking..." : "LOGIN"}
             </button>
