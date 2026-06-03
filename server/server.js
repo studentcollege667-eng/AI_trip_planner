@@ -164,9 +164,7 @@ app.post("/reset-password", async (req, res) => {
 
     const { error } = await supabase
       .from("users")
-      .update({
-        password: hashedPassword,
-      })
+      .update({ password: hashedPassword })
       .eq("email", email);
 
     if (error) {
