@@ -135,7 +135,58 @@ app.post("/login", async (req, res) => {
     });
   }
 });
+// RESET PASSWORD
+app.post("/reset-password", async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
 
+    if (!email || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        error: "Email and new password required",
+      });
+    }
+
+    const { data: user, error: findError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .maybeSingle();
+
+    if (findError || !user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found with this email",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    const { error } = await supabase
+      .from("users")
+      .update({
+        password: hashedPassword,
+      })
+      .eq("email", email);
+
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        error: error.message,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Password reset successful",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
 // GENERATE TRIP
 app.post("/generate-trip", async (req, res) => {
   try {
@@ -149,28 +200,42 @@ app.post("/generate-trip", async (req, res) => {
     }
 
     const prompt = `
-You are a professional travel planner.
+You are a smart budget travel planner.
 
-Create a clean, structured and easy-to-read travel plan.
+Create a realistic trip plan strictly within the user's total budget.
 
 Destination: ${destination}
 Days: ${days}
-Budget: ${budget}
+Total Budget: ₹${budget}
+
+Important Rules:
+- The complete trip cost must be within ₹${budget}.
+- Do not suggest hotels, food, transport, or activities that make the total cost exceed ₹${budget}.
+- If the budget is low, suggest budget hotels, hostels, homestays, local transport, street food, and free/low-cost places.
+- Do not give luxury hotels unless the budget allows it.
+- Calculate the cost carefully.
+- Budget breakdown total must be less than or equal to ₹${budget}.
+- Mention "Total Estimated Cost" at the end.
+- Mention "Remaining Budget" if money is left.
+- If budget is not enough for the destination/days, clearly say it is difficult and suggest reducing days or increasing budget.
 
 Use this exact format:
 
 # 🌍 TRIP OVERVIEW
 📍 Destination: ${destination}
 🗓️ Duration: ${days} Days
-💰 Budget: ${budget}
+💰 User Budget: ₹${budget}
 
-# 🏨 RECOMMENDED HOTELS
-Provide 3 budget-friendly hotels.
-For each hotel write:
-- Hotel Name:
-- Location:
-- Approx Price:
-- Rating:
+# ✅ BUDGET STATUS
+Write whether this trip is possible within ₹${budget}.
+
+# 🏨 BUDGET STAY OPTIONS
+Give 3 affordable stay options only.
+For each:
+- Name:
+- Type:
+- Approx Price Per Night:
+- Why suitable for this budget:
 
 # 📅 DAY WISE ITINERARY
 
@@ -180,28 +245,33 @@ For each day, use this format:
 🌅 Morning:
 🌞 Afternoon:
 🌙 Evening:
-🍴 Food Suggestions:
-💵 Estimated Cost:
+🍴 Food:
+🚍 Transport:
+💵 Day Estimated Cost:
 
 Continue same format for all ${days} days.
 
 # 💰 BUDGET BREAKDOWN
-Hotel:
+Stay:
 Food:
 Transport:
 Activities:
 Miscellaneous:
-Total:
 
-# 🎯 TRAVEL TIPS
-Give 5 useful budget travel tips.
+# 🧾 TOTAL COST SUMMARY
+Total Estimated Cost:
+User Budget: ₹${budget}
+Remaining Budget:
+
+# 🎯 MONEY SAVING TIPS
+Give 5 useful tips to complete the trip within ₹${budget}.
 
 Rules:
-- Keep the output clean.
-- Do not write long paragraphs.
+- Keep output clean.
 - Use short points.
-- Make it look professional.
-- Do not add unnecessary explanation.
+- Do not exceed user's budget.
+- Do not create unrealistic expensive plans.
+- All costs must be in Indian Rupees using ₹ symbol.
 `;
 
     const completion = await groq.chat.completions.create({
