@@ -7,6 +7,7 @@ const API_URL = "https://ai-trip-planner-3aot.onrender.com";
 export default function Login() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -26,9 +27,7 @@ export default function Login() {
 
       const res = await fetch(`${API_URL}/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginForm),
       });
 
@@ -50,70 +49,136 @@ export default function Login() {
   };
 
   return (
-    <div className="login-page">
-      <div className="glass-container">
-        <div className="login-card">
-          <form onSubmit={handleLogin}>
-            <h2 className="login-title">Login to Your Account</h2>
+    <div className="auth-bag-page">
+      <div className="auth-layout">
+        <div className="auth-left">
+          <div className="brand-row">
+            <div className="brand-logo">A</div>
+            <h1>AI Trip Planner</h1>
+          </div>
 
-            <input
-              className="glass-input"
-              placeholder="Email"
-              value={loginForm.email}
-              onChange={(e) =>
-                setLoginForm({
-                  ...loginForm,
-                  email: e.target.value,
-                })
-              }
-            />
+          <h2>
+            Plan Your Trip,
+            <span> Smartly With AI</span>
+          </h2>
 
-            <input
-              className="glass-input"
-              type="password"
-              placeholder="Password"
-              value={loginForm.password}
-              onChange={(e) =>
-                setLoginForm({
-                  ...loginForm,
-                  password: e.target.value,
-                })
-              }
-            />
+          <p>
+            Login karke apna smart AI travel plan generate karo with hotels,
+            places, budget, maps and full itinerary.
+          </p>
 
-           <p
-    style={{
-       marginBottom: "15px",
-       cursor: "pointer",
-       textAlign: "right",
-       color: "white",
-       fontSize: "14px",
-      }}
-        onClick={() => navigate("/forgot-password")}
-    >
-        Forgot Password?
-    </p> 
-            <button className="login-btn" disabled={loading}>
-              {loading ? "Checking..." : "LOGIN"}
-            </button>
-
-            <p style={{ marginTop: "15px", cursor: "pointer" }}>
-              New user?{" "}
-              <span onClick={() => navigate("/signup")}>Create Account</span>
-            </p>
-          </form>
+          <div className="auth-features">
+            <Feature icon="🔒" title="Secure Login" text="Your account safe and protected." />
+            <Feature icon="⚡" title="Fast Planning" text="Few seconds me trip plan ready." />
+            <Feature icon="🌍" title="Real Destinations" text="Places, hotels and maps support." />
+          </div>
         </div>
 
-        <div className="hero-section">
-          <h1>
-            THE GOAL OF LIFE IS
-            <br />
-            LIVING IN AGREEMENT
-            <br />
-            WITH NATURE
-          </h1>
+        <div className="auth-right">
+          <div className="floating-icon auth-i1">🔐</div>
+          <div className="floating-icon auth-i2">👤</div>
+          <div className="floating-icon auth-i3">📊</div>
+
+          <div className="auth-card-pop">
+            <form onSubmit={handleLogin} className="auth-card">
+              <div className="auth-card-head">
+                <div className="auth-card-logo">A</div>
+                <h3>Welcome Back!</h3>
+                <p>Login to your AI Trip Planner account</p>
+              </div>
+
+              <input
+                className="auth-input"
+                type="email"
+                placeholder="Enter your email"
+                value={loginForm.email}
+                onChange={(e) =>
+                  setLoginForm({ ...loginForm, email: e.target.value })
+                }
+              />
+
+              <input
+                className="auth-input"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter password"
+                value={loginForm.password}
+                onChange={(e) =>
+                  setLoginForm({ ...loginForm, password: e.target.value })
+                }
+              />
+
+              <div className="auth-row">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={showPassword}
+                    onChange={() => setShowPassword(!showPassword)}
+                  />{" "}
+                  Show Password
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/forgot-password")}
+                >
+                  Forgot?
+                </button>
+              </div>
+
+              <button className="auth-main-btn" disabled={loading}>
+                {loading ? "Checking..." : "LOGIN"}
+              </button>
+
+              <p className="auth-switch">
+                New user?{" "}
+                <span onClick={() => navigate("/signup")}>Create Account</span>
+              </p>
+            </form>
+          </div>
+
+          <div className="bag-glow"></div>
+
+          <div className="cartoon-human">
+            <div className="human">
+              <div className="human-head">
+                <div className="hair"></div>
+                <div className="eye left-eye"></div>
+                <div className="eye right-eye"></div>
+                <div className="smile"></div>
+              </div>
+
+              <div className="human-body"></div>
+              <div className="human-shirt"></div>
+              <div className="human-arm"></div>
+              <div className="human-hand">👉</div>
+              <div className="leg leg-left"></div>
+              <div className="leg leg-right"></div>
+              <div className="shoe shoe-left"></div>
+              <div className="shoe shoe-right"></div>
+            </div>
+          </div>
+
+          <div className="office-bag">
+            <div className="bag-lid"></div>
+            <div className="bag-pocket"></div>
+            <div className="bag-lock"></div>
+            <div className="bag-side bag-side-left"></div>
+            <div className="bag-side bag-side-right"></div>
+          </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function Feature({ icon, title, text }) {
+  return (
+    <div className="auth-feature">
+      <div>{icon}</div>
+      <section>
+        <h4>{title}</h4>
+        <p>{text}</p>
+      </section>
     </div>
   );
 }
